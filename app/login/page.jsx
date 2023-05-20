@@ -1,11 +1,18 @@
 'use client';
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { Messages } from 'primereact/messages'
 import Link from 'next/link'
 
+//theme
+import "primereact/resources/themes/lara-dark-indigo/theme.css"     
+//core
+import "primereact/resources/primereact.min.css"
+import 'primeicons/primeicons.css';
+
 export default function login (){
-    const [message, setMessage] = useState('')
     const router = useRouter()
+    const msg = useRef(null)
 
     useEffect(() => {
         if(window.localStorage.getItem('user') !== undefined && window.localStorage.getItem('user'))
@@ -29,14 +36,19 @@ export default function login (){
             localStorage.setItem('user', JSON.stringify(result.data))
             router.push('/')
         }
-        else if(result.message === 'password is incorrect') setMessage('La contraseña no es correcta') 
-        else setMessage('El correo electronico no esta registrado o no es valido')
+        else if(result.message === 'password is incorrect') showMessage('error', 'Error', 'Password is incorrect') 
+        else showMessage('error', 'Error', 'Email is not valid or is not registered')
       })
   
+    }
+
+    const showMessage = (severity, summary, detail) => {
+      msg.current.show({ life: 3000, severity: severity, summary: summary, detail: detail, sticky: true })
     }
   
     return (
       <div>
+        <Messages ref={msg} />
         <form className='mx-auto w-1/3 border rounded-lg mt-10 px-5 py-10 shadow-md' onSubmit={handlerSubmit}>
           <h1 className='text-center text-3xl my-10 font-semibold'>Login</h1>
           <input id='email' placeholder='email' type="email" className='w-full py-1 px-4 rounded rounded-lg text-gray-200 bg-transparent border mb-2' required />
